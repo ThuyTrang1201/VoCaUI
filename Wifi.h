@@ -50,6 +50,10 @@ void initWifi(){
     LOG(server.argName(i)+": "+ server.arg(i));
     if(server.argName(i) == "reset")
       ESP.reset();
+    if(server.argName(i) == "format"){
+      SPIFFS.format();
+      ConfigFileJson.to<JsonObject>();
+    }
     ConfigFileJson[server.argName(i)]=server.arg(i);
   }
   saveConfigFile();

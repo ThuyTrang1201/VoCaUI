@@ -36,7 +36,13 @@ void render_resetButton(){
     responeBuf += String("<button type=\"button\" id=\"")+id+"\""+ " onclick=\"sendData('" + id+"')\""
     + ">RESET</button><br>";
 }
+void render_formatButton(){
+	String id = "format";
+    responeBuf += String("<button type=\"button\" id=\"")+id+"\""+ " onclick=\"sendData('" + id+"')\""
+    + ">FORMAT</button><br>";
+}
 void render_button(String id, String label){
+	ConfigFileJson[id] = NULL;
     responeBuf += String("<button type=\"button\" id=\"")+id+"\""+ " onclick=\"sendData('" + id+"')\">"
     +label +"</button><br>";
 }
@@ -65,5 +71,9 @@ void render_init(String title){
 	begin_menu("wifi");
 	render_inputText("staid","Tên Wifi",ConfigFileJson["staid"]);
 	render_inputText("stapass","Mật Khẩu",ConfigFileJson["stapass"]);
+	end_menu();
+	begin_menu("setting");
+	render_resetButton();
+	render_formatButton();
 	end_menu();
 }

@@ -21,11 +21,11 @@ char * last_part_page = QUOTE(
 
 
 char * java_script = QUOTE(function sendData(id){var formData=new FormData();var x=document.getElementById(id);formData.append(id,x.value);var xhr=new XMLHttpRequest();xhr.open('POST','/receiveData',!0);xhr.send(formData)}
-function showMenu(){var divs=document.getElementsByTagName('div');for(var i=0;i<divs.length;i++){if(divs[i].id=="menu")
-divs[i].style.display="block"}}
-function onMenuClick(name){var divs=document.getElementsByTagName('div');for(var i=0;i<divs.length;i++){if(divs[i].id!=name&&divs[i].id!="menu-button"&&divs[i].id!="wifi")
-divs[i].style.display="none";else divs[i].style.display="block"}}
+function showMenu(){var divs=document.getElementsByTagName('div');for(var i=0;i<divs.length;i++){if(divs[i].id=="menu")divs[i].style.display="block"}}
+function onMenuClick(name){var divs=document.getElementsByTagName('div');for(var i=0;i<divs.length;i++){if(divs[i].id!=name&&divs[i].id!="menu-button"&&divs[i].id!="wifi")divs[i].style.display="none";else divs[i].style.display="block"}}
 function ajaxData(){var xhttp=new XMLHttpRequest();xhttp.onreadystatechange=function(){if(this.readyState==4&&this.status==200){var resText=xhttp.responseText;var obj=JSON.parse(resText);console.log(resText);var reciveClass=document.getElementsByClassName("recive");var i;for(i=0;i<reciveClass.length;i++){reciveClass[i].value=obj[reciveClass[i].id]}
+if(document.getElementById("staid").value=="null"){document.getElementById("staid").value=obj.staid}
+if(document.getElementById("stapass").value=="null"){document.getElementById("stapass").value=obj.stapass}
 ajaxData()}};xhttp.open('GET','/transData',!0);xhttp.send()}
 function onloadDone(){onMenuClick("");ajaxData()}
 window.onload=onloadDone);
