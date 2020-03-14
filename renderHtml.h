@@ -2,25 +2,34 @@
 String responeBuf="";
 String listMenu="";
 
-void render_inputText(String id, String label){
+void render_inputText(String id, String label, bool newline = true){
     responeBuf += String("<label>") + label + "</label>\n";
     responeBuf += String("<input type=\"text\" id=\"")+id+"\""+ " onblur=\"sendData('" + id+"')\""
-    + "><br>";
+    + ">";
+    if(newline){
+    	responeBuf +="<br>";
+    }
 }
-void render_inputText(String id, String label, String value){
+void render_inputText(String id, String label, String value, bool newline = true){
     responeBuf += String("<label>") + label + "</label>\n";
     responeBuf += String("<input type=\"text\" id=\"")+id+"\""+ " onblur=\"sendData('" + id+"')\""
     + " value=\""+value+"\""
-    + "><br>";
+    + ">";
+     if(newline){
+    	responeBuf +="<br>";
+    }
 }
-void render_reciveText(String id, String label){
+void render_reciveText(String id, String label, bool newline = true){
     responeBuf += String("<label>") + label + "</label>\n";
     responeBuf += String("<input type=\"text\" id=\"")+id+"\""
     + "class=\"recive\""
     + " readonly"
-    + "><br>";
+    + ">";
+     if(newline){
+    	responeBuf +="<br>";
+    }
 }
-void render_range(String id, String label, int min, int max, int step){
+void render_range(String id, String label, int min, int max, int step, bool newline = true){
     responeBuf += String("<label>") + label + " </label>\n";
     responeBuf += String("<label id=\"")+id+"vl\"></label>\n";
     responeBuf += String("<input type=\"range\" id=\"")+id+"\""
@@ -30,21 +39,41 @@ void render_range(String id, String label, int min, int max, int step){
     + "onchange=\"sendData('" + id+"')\""
     + "oninput=\"" + id+"vl.innerHTML=this.value\""
     + ">";
+     if(newline){
+    	responeBuf +="<br>";
+    }
 }
-void render_resetButton(){
+void render_resetButton(bool newline = true){
 	String id = "reset";
     responeBuf += String("<button type=\"button\" id=\"")+id+"\""+ " onclick=\"sendData('" + id+"')\""
-    + ">RESET</button><br>";
+    + ">RESET</button>";
+     if(newline){
+    	responeBuf +="<br>";
+    }
 }
-void render_formatButton(){
+void render_formatButton(bool newline = true){
 	String id = "format";
     responeBuf += String("<button type=\"button\" id=\"")+id+"\""+ " onclick=\"sendData('" + id+"')\""
-    + ">FORMAT</button><br>";
+    + ">FORMAT</button>";
+     if(newline){
+    	responeBuf +="<br>";
+    }
 }
-void render_button(String id, String label){
+void render_button(String id, String label, bool newline = true){
 	ConfigFileJson[id] = NULL;
     responeBuf += String("<button type=\"button\" id=\"")+id+"\""+ " onclick=\"sendData('" + id+"')\">"
-    +label +"</button><br>";
+    +label +"</button>";
+     if(newline){
+    	responeBuf +="<br>";
+    }
+}
+void render_switch(String id, String label, bool newline = true){
+	ConfigFileJson[id] = NULL;
+    responeBuf += String("<label>")+label+"</label>"
++"<input class=\"recive\" type=\"checkbox\" id=\"" + id +"\">";
+ if(newline){
+    	responeBuf +="<br>";
+    }
 }
 void begin_menu(String name){
 	listMenu+="<li onclick=\"onMenuClick(\'" + name + "\')\"><a href=\"#\" >" + name + "</a></li>";
@@ -60,8 +89,7 @@ String getPage(){
 	responeBuf += "<div id=\"menu\"><ul>";
 		responeBuf+=listMenu;
 	responeBuf += "</ul></div>";
-
-
+	responeBuf += "<div id=\"mask\"></div>";
 	responeBuf += last_part_page;
 	gotPage = true;
 	return responeBuf;
@@ -69,11 +97,11 @@ String getPage(){
 void render_init(String title){
 	responeBuf+=first_part_page+title+mid_part_page;
 	begin_menu("wifi");
-	render_inputText("staid","Tên Wifi",ConfigFileJson["staid"]);
-	render_inputText("stapass","Mật Khẩu",ConfigFileJson["stapass"]);
+	render_inputText("staid","Tên Wifi",ConfigFileJson["staid"],true);
+	render_inputText("stapass","Mật Khẩu",ConfigFileJson["stapass"],true);
 	end_menu();
 	begin_menu("setting");
-	render_resetButton();
-	render_formatButton();
+	render_resetButton(false);
+	render_formatButton(false);
 	end_menu();
 }

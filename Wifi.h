@@ -44,7 +44,6 @@ void initWifi(){
   server.send(200, F("text/html"), menu_css);
  });
  server.on("/receiveData",[](){
-  LOG("receiving Data");
   for (int i = 0; i < server.args(); ++i)
   {
     LOG(server.argName(i)+": "+ server.arg(i));

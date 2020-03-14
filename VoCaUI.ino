@@ -1,48 +1,53 @@
+
 #include "vocaui.h"
-
+#include <OneWire.h>
+#include <DallasTemperature.h>
+#define ONE_WIRE_BUS D1
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire);
 void setup() {
-	loadConfigFile();
-	render_init("put your setup code here, to run once:");
+  pinMode(D2, OUTPUT);
+  digitalWrite(D2, LOW);
+  delay(5000);
+  loadConfigFile();
+  render_init("Điều khiển nhiệt độ");
+  begin_menu("ĐK. Nhiệt độ");
+  render_reciveText("curTemp", "Hiện Tại");
+  render_button("onRelay", "Bật bơm",false);
+  render_button("offRelay", "Tắt bơm");
+  render_switch("pump", "Máy Bơm",false);
+  render_switch("overTemp", "Quá Nhiệt");
+  end_menu();
 
-	begin_menu("tesssst");
-	render_reciveText("test","test");
-	render_reciveText("millis","millis");
-	render_range("range","chay thu",0,100,1);
-	end_menu();
-
-
-	begin_menu("Xem nhiệt độ");
-
-	render_reciveText("curTemp","Nhiệt độ hiện tại");
-	end_menu();
-
-
-	begin_menu("Kiểm tra nút nhấn");
-
-	render_button("button","Nhấn thử đi");
-	end_menu();
-	Serial.begin(115200);
-	initVoCa();
+  Serial.begin(115200);
+  initVoCa();
+  sensors.begin();
+  sensors.setWaitForConversion(false);
 
 
 }
-uint32_t ledTimer = 0,counttttttt=0;
 void loop() {
+  voCaHandle();
+  sensors.requestTemperatures();
 
-voCaHandle();
+  ConfigFileJson["curTemp"] = sensors.getTempCByIndex(0);
+  if(ConfigFileJson["curTemp"]>32)
+  	ConfigFileJson["overTemp"]=true;
+  else
+  	ConfigFileJson["overTemp"]=false;
+  if (ConfigFileJson["onRelay"] != NULL) {
+    ConfigFileJson["onRelay"] = NULL;
+    digitalWrite(D2, HIGH);
+  }
+ 
+  
+  if (ConfigFileJson["offRelay"] != NULL) {
+    ConfigFileJson["offRelay"] = NULL;
+    digitalWrite(D2, LOW);
+  }
+   if(digitalRead(D2)== HIGH)
+  	ConfigFileJson["pump"] = true;
+  if(digitalRead(D2)== LOW)
+  	ConfigFileJson["pump"] = false;
 
-counttttttt++;
-ConfigFileJson["test"]= counttttttt;
-ConfigFileJson["millis"]= millis();
-
-
-if(ConfigFileJson["button"] !=NULL){
-	LOG(String("button ") + "da nhan");
-	ConfigFileJson["button"] = NULL;
-}
-uint32_t tmpInt = ConfigFileJson["range"].as<int>();
-if(millis() - ledTimer > tmpInt*10){
-		 digitalWrite(LED_PIN, !digitalRead(LED_PIN));
-		 ledTimer=millis();
-	}
 }
