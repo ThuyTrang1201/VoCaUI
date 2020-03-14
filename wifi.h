@@ -7,8 +7,15 @@
 #include "renderHtml.h"
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPUpdateServer.h>
+#include <NTPClient.h>
+#include <WiFiUdp.h>
+WiFiUDP ntpUDP;
 ESP8266WebServer server(80);
 ESP8266HTTPUpdateServer httpUpdater;
+NTPClient timeClient(ntpUDP, "1.asia.pool.ntp.org",3600*7);
+
+bool gotTime = false;
+
 void initWifi(){
   pinMode(LED_PIN, OUTPUT);
   WiFi.disconnect();
@@ -54,12 +61,14 @@ void initWifi(){
       ConfigFileJson.to<JsonObject>();
     }
     ConfigFileJson[server.argName(i)]=server.arg(i);
+    digitalWrite(LED_PIN, !digitalRead(LED_PIN));
   }
   saveConfigFile();
   server.send(200, "text/html", "");
  });
  server.on("/transData",[](){
     server.send(200, "text/html", ConfigFileJson.as<String>());
+    digitalWrite(LED_PIN, !digitalRead(LED_PIN));
  });
   httpUpdater.setup(&server);
   server.begin();
@@ -73,10 +82,19 @@ void initWifi(){
     LOG(WiFi.localIP());
     digitalWrite(LED_PIN, !digitalRead(LED_PIN));
   }
+  timeClient.begin();
+
   digitalWrite(LED_PIN, HIGH);
 }
  
 void wifiHandle(){
-  server.handleClient();
+
+      server.handleClient();
+      if(!gotTime)
+        gotTime = timeClient.update();
+
+
+
+ConfigFileJson["time"]=timeClient.getEpochTime();
 }
 #endif

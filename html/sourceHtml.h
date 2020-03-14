@@ -21,12 +21,13 @@ char * last_part_page = QUOTE(
 );
 
 
-char * java_script = QUOTE(function sendData(id){var formData=new FormData();var x=document.getElementById(id);formData.append(id,x.value);var xhr=new XMLHttpRequest();xhr.open("POST","/receiveData",!0);xhr.send(formData)}
+char * java_script = QUOTE(var isConnected=setTimeout(isConnectedFunc,2000);function isConnectedFunc(){document.getElementById("wifi").style.background="gray"}
+function sendData(id){var formData=new FormData();var x=document.getElementById(id);formData.append(id,x.value);var xhr=new XMLHttpRequest();xhr.open("POST","/receiveData",!0);xhr.send(formData)}
 function showMenu(){var menuBtn=document.getElementById("menu-button");menuBtn.style.left="-100%";var menu=document.getElementById("menu");menu.style.left="0%";var mask=document.getElementById("mask");mask.style.left="0%"}
 function hideMenu(){var menuBtn=document.getElementById("menu-button");menuBtn.style.left="0%";var menu=document.getElementById("menu");menu.style.left="-100%";var mask=document.getElementById("mask");mask.style.left="200%"}
 function onMenuClick(name){var divs=document.getElementsByTagName("div");hideMenu();for(var i=0;i<divs.length;i++){if(divs[i].id!=name&&divs[i].id!="menu-button"&&divs[i].id!="wifi"&&divs[i].id!="menu"&&divs[i].id!="mask")
 divs[i].style.display="none";else divs[i].style.display="block"}}
-function ajaxData(){var xhttp=new XMLHttpRequest();xhttp.onreadystatechange=function(){if(this.readyState==4&&this.status==200){var resText=xhttp.responseText;var obj=JSON.parse(resText);console.log(resText);var reciveClass=document.getElementsByClassName("recive");var i;for(i=0;i<reciveClass.length;i++){if(reciveClass[i].type=="checkbox")
+function ajaxData(){var xhttp=new XMLHttpRequest();xhttp.onreadystatechange=function(){if(this.readyState==4&&this.status==200){var resText=xhttp.responseText;var obj=JSON.parse(resText);document.getElementById("wifi").style.background="#4caf50";clearTimeout(isConnected);isConnected=setTimeout(isConnectedFunc,2000);console.log(resText);var d=new Date(0);d.setUTCSeconds(obj.time);document.getElementById("time").innerHTML=d.toISOString().split("T")[1].split(".")[0];var reciveClass=document.getElementsByClassName("recive");var i;for(i=0;i<reciveClass.length;i++){if(reciveClass[i].type=="checkbox")
 reciveClass[i].checked=obj[reciveClass[i].id];else reciveClass[i].value=obj[reciveClass[i].id]}
 if(document.getElementById("staid").value=="null"){document.getElementById("staid").value=obj.staid}
 if(document.getElementById("stapass").value=="null"){document.getElementById("stapass").value=obj.stapass}

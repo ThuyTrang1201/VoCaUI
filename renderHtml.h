@@ -19,6 +19,13 @@ void render_inputText(String id, String label, String value, bool newline = true
     	responeBuf +="<br>";
     }
 }
+void render_Label(String id, String label, bool newline = true){
+    responeBuf += String("<label>") + label + "</label>";
+    responeBuf += String("<label id=\"")+id+"\">" + label + "</label>\n";
+     if(newline){
+        responeBuf +="<br>";
+    }
+}
 void render_reciveText(String id, String label, bool newline = true){
     responeBuf += String("<label>") + label + "</label>\n";
     responeBuf += String("<input type=\"text\" id=\"")+id+"\""
@@ -96,6 +103,7 @@ String getPage(){
 void render_init(String title){
 	responeBuf+=first_part_page+title+mid_part_page;
 	begin_menu("wifi");
+    render_Label("time","T.Gian: ");
 	render_inputText("staid","Tên Wifi",ConfigFileJson["staid"],true);
 	render_inputText("stapass","Mật Khẩu",ConfigFileJson["stapass"],true);
 	end_menu();

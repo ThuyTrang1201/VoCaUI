@@ -15,6 +15,7 @@ void setup() {
   render_reciveText("curTemp", "Hiện Tại");
   render_button("onRelay", "Bật bơm",false);
   render_button("offRelay", "Tắt bơm");
+  render_range("overValue","G.trị quá nhiệt",0,100,1);
   render_switch("pump", "Máy Bơm",false);
   render_switch("overTemp", "Quá Nhiệt");
   end_menu();
@@ -31,7 +32,7 @@ void loop() {
   sensors.requestTemperatures();
 
   ConfigFileJson["curTemp"] = sensors.getTempCByIndex(0);
-  if(ConfigFileJson["curTemp"]>32)
+  if(ConfigFileJson["curTemp"]> float(ConfigFileJson["overValue"]))
   	ConfigFileJson["overTemp"]=true;
   else
   	ConfigFileJson["overTemp"]=false;
@@ -49,5 +50,5 @@ void loop() {
   	ConfigFileJson["pump"] = true;
   if(digitalRead(D2)== LOW)
   	ConfigFileJson["pump"] = false;
-
+LOG(int(ConfigFileJson["time"]));
 }
