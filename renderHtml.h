@@ -89,7 +89,6 @@ String getPage(){
 	responeBuf += "<div id=\"menu\"><ul>";
 		responeBuf+=listMenu;
 	responeBuf += "</ul></div>";
-	responeBuf += "<div id=\"mask\"></div>";
 	responeBuf += last_part_page;
 	gotPage = true;
 	return responeBuf;
