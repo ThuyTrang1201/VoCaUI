@@ -4,7 +4,7 @@ String listMenu="";
 
 void render_inputText(String id, String label, bool newline = true){
     responeBuf += String("<label>") + label + "</label>\n";
-    responeBuf += String("<input type=\"text\" id=\"")+id+"\""+ " onblur=\"sendData('" + id+"')\""
+    responeBuf += String("<input type=\"text\" id=\"")+id+"\""+ " onblur=\"sendData(this)\""
     + ">";
     if(newline){
     	responeBuf +="<br>";
@@ -12,7 +12,7 @@ void render_inputText(String id, String label, bool newline = true){
 }
 void render_inputText(String id, String label, String value, bool newline = true){
     responeBuf += String("<label>") + label + "</label>\n";
-    responeBuf += String("<input type=\"text\" id=\"")+id+"\""+ " onblur=\"sendData('" + id+"')\""
+    responeBuf += String("<input type=\"text\" id=\"")+id+"\""+ " onblur=\"sendData(this)\""
     + " value=\""+value+"\""
     + ">";
      if(newline){
@@ -43,7 +43,7 @@ void render_range(String id, String label, int min, int max, int step, bool newl
     + "min=\'" + min +"\'"
     + "max=\'" + max +"\'"
     + "step=\'" + step +"\'"
-    + "onchange=\"sendData('" + id+"')\""
+    + "onchange=\"sendData(this)\""
     + "oninput=\"this.previousSibling.innerHTML=this.value\""
     + ">";
      if(newline){
@@ -52,7 +52,7 @@ void render_range(String id, String label, int min, int max, int step, bool newl
 }
 void render_resetButton(bool newline = true){
 	String id = "reset";
-    responeBuf += String("<button type=\"button\" id=\"")+id+"\""+ " onclick=\"sendData('" + id+"')\""
+    responeBuf += String("<button type=\"button\" id=\"")+id+"\""+ " onclick=\"sendData(this)\""
     + ">RESET</button>";
      if(newline){
     	responeBuf +="<br>";
@@ -60,7 +60,7 @@ void render_resetButton(bool newline = true){
 }
 void render_formatButton(bool newline = true){
 	String id = "format";
-    responeBuf += String("<button type=\"button\" id=\"")+id+"\""+ " onclick=\"sendData('" + id+"')\""
+    responeBuf += String("<button type=\"button\" id=\"")+id+"\""+ " onclick=\"sendData(this)\""
     + ">FORMAT</button>";
      if(newline){
     	responeBuf +="<br>";
@@ -68,7 +68,7 @@ void render_formatButton(bool newline = true){
 }
 void render_button(String id, String label, bool newline = true){
 	ConfigFileJson[id] = NULL;
-    responeBuf += String("<button type=\"button\" id=\"")+id+"\""+ " onclick=\"sendData('" + id+"')\">"
+    responeBuf += String("<button type=\"button\" id=\"")+id+"\""+ " onclick=\"sendData(this)\">"
     +label +"</button>";
      if(newline){
     	responeBuf +="<br>";
@@ -86,7 +86,7 @@ void render_switch(String id, String label, bool newline = true){
   ConfigFileJson[id] = NULL;
     responeBuf += String("<label>")+label+"</label>"
 +"<input type=\"checkbox\" id=\"" + id +"\""
-+ " onclick=\"sendData('" + id+"')\""
++ " onclick=\"sendData(this)\""
 +"\">";
  if(newline){
       responeBuf +="<br>";
