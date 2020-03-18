@@ -50,12 +50,20 @@ void render_range(String id, String label, int min, int max, int step, bool newl
     	responeBuf +="<br>";
     }
 }
-void render_resetButton(bool newline = true){
+void render_updatetButton(bool newline = true){
 	String id = "reset";
+    responeBuf += String("<button type=\"button\" id=\"")+id+"\""+ " onclick=\"location.assign('/update')\""
+    + ">UPDATE</button>";
+     if(newline){
+    	responeBuf +="<br>";
+    }
+}
+void render_resetButton(bool newline = true){
+    String id = "reset";
     responeBuf += String("<button type=\"button\" id=\"")+id+"\""+ " onclick=\"sendData(this)\""
     + ">RESET</button>";
      if(newline){
-    	responeBuf +="<br>";
+        responeBuf +="<br>";
     }
 }
 void render_formatButton(bool newline = true){
@@ -120,5 +128,6 @@ void render_init(String title){
 	begin_menu("setting");
 	render_resetButton(false);
 	render_formatButton(false);
+    render_updatetButton();
 	end_menu();
 }
