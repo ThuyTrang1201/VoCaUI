@@ -20,29 +20,28 @@ void initWifi(){
   pinMode(LED_PIN, OUTPUT);
   WiFi.disconnect();
   WiFi.mode(WIFI_AP_STA);
-  loadConfigFile();
   if(ConfigFileJson.containsKey("apid") 
     && ConfigFileJson.containsKey("appass")){
-    LOG(String("AP id: ")+ConfigFileJson["apid"].as<String>());
-    LOG(String("AP pass: ")+ConfigFileJson["appass"].as<String>());
-    WiFi.softAP(ConfigFileJson["apid"].as<String>(), ConfigFileJson["appass"].as<String>());
+    LOG(String("AP id: ")+ConfigFileJson["apid"].as<char *>());
+    LOG(String("AP pass: ")+ConfigFileJson["appass"].as<char *>());
+    WiFi.softAP(ConfigFileJson["apid"].as<char *>(), ConfigFileJson["appass"].as<char *>());
   }else{
   
     LOG(F("not found AP info, use default value"));
-    WiFi.softAP(DEFAULT_APID, DEFAULT_APPASS);
+    WiFi.softAP(String(DEFAULT_APID)+NAME_DEVICE, DEFAULT_APPASS);
   }
 
  if(ConfigFileJson.containsKey("staid") 
     && ConfigFileJson.containsKey("stapass")){
-    LOG(String("STA id: ")+ConfigFileJson["staid"].as<String>());
-    LOG(String("STA pass: ")+ConfigFileJson["stapass"].as<String>());
-    WiFi.begin(ConfigFileJson["staid"].as<String>(), ConfigFileJson["stapass"].as<String>());
+    LOG(String("STA id: ")+ConfigFileJson["staid"].as<char *>());
+    LOG(String("STA pass: ")+ConfigFileJson["stapass"].as<char *>());
+    WiFi.begin(ConfigFileJson["staid"].as<char *>(), ConfigFileJson["stapass"].as<char *>());
   }else{
-    LOG(F("not found STA info, cant begin it"));
+    LOG(F("not found STA info, can't begin it"));
   }
 
  server.on("/",[](){
-  server.send(200, F("text/html"), getPage());
+  server.send(200, "text/html", getPage());
  });
  server.on("/script.js",[](){
   server.send(200, F("text/html"), java_script);
@@ -51,24 +50,35 @@ void initWifi(){
   server.send(200, F("text/html"), menu_css);
  });
  server.on("/receiveData",[](){
+ 
   for (int i = 0; i < server.args(); ++i)
   {
-    LOG(server.argName(i)+": "+ server.arg(i));
-    if(server.argName(i) == "reset")
+    String key = server.argName(i);
+    String value = server.arg(i);
+
+    if(key == "reset")
       ESP.reset();
-    if(server.argName(i) == "format"){
+    if(key == "format"){
+      ConfigFileJson.to<JsonObject>().clear();
       SPIFFS.format();
-      ConfigFileJson.to<JsonObject>();
     }
-    ConfigFileJson[server.argName(i)]=server.arg(i);
+    if(key == "all"){ // yeu cau gui du lieu
+      setValue("","");
+    }
+    setValue(key.c_str(),value.c_str());
     digitalWrite(LED_PIN, !digitalRead(LED_PIN));
   }
   saveConfigFile();
   server.send(200, "text/html", "");
  });
  server.on("/transData",[](){
+  if(!setValueFlag){
+    server.send(504, "text/html", "");
+    return;
+  }
     server.send(200, "text/html", ConfigFileJson.as<String>());
     digitalWrite(LED_PIN, !digitalRead(LED_PIN));
+    setValueFlag=false;
  });
   httpUpdater.setup(&server);
   server.begin();
@@ -76,12 +86,27 @@ void initWifi(){
 
   while (WiFi.status() != WL_CONNECTED )
   {
-    delay(100);
+    delay(200);
     server.handleClient();
-    LOG(F("Got IP: "));
-    LOG(WiFi.localIP());
     digitalWrite(LED_PIN, !digitalRead(LED_PIN));
+    delay(50);
+         digitalWrite(LED_PIN, !digitalRead(LED_PIN));
+    delay(50);
+digitalWrite(LED_PIN, !digitalRead(LED_PIN));
+    delay(50);
+         digitalWrite(LED_PIN, !digitalRead(LED_PIN));
+    delay(50);
+    digitalWrite(LED_PIN, !digitalRead(LED_PIN));
+    delay(50);
+         digitalWrite(LED_PIN, !digitalRead(LED_PIN));
+    delay(50);
+digitalWrite(LED_PIN, !digitalRead(LED_PIN));
+    delay(50);
+         digitalWrite(LED_PIN, !digitalRead(LED_PIN));
+    delay(50);
   }
+      LOG(F("Got IP: "));
+    LOG(WiFi.localIP());
   timeClient.begin();
 
   digitalWrite(LED_PIN, HIGH);
