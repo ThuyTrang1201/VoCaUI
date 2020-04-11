@@ -21,7 +21,7 @@ void setup() {
   });
 
   render_reciveText("device", "Đèn đang: ", true);
-
+  end_menu();
 
 
   begin_menu("Hẹn giờ Thiết Bị");
