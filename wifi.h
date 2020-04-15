@@ -76,6 +76,7 @@ void initWifi(){
     server.send(504, "text/html", "");
     return;
   }
+
     server.send(200, "text/html", ConfigFileJson.as<String>());
     digitalWrite(LED_PIN, !digitalRead(LED_PIN));
     setValueFlag=false;

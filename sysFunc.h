@@ -47,36 +47,36 @@ void loadConfigFile(bool clearNotImportant ) {
    LOG(String("Content config file: "));
    LOG(ConfigFileJson.as<String>());
   isLoadConfigFile = true;
+  cfg_file.close();
   if(clearNotImportant){
     clearNotImportantAttr();
   }
 }
 
 void saveConfigFile() {
+
   if (!isLoadConfigFile){
     LOG(F("load config file first !!!"));
     return;
   }
-  if(!SPIFFS.begin()){
-    LOG(F("Can't begin SPIFFS !!!"));
-    return;
-  }
+
   File cfg_file = SPIFFS.open(CONFIG_FILE, "w");
   if(!cfg_file){
     LOG(F("Can't open config file !!!"));
+    return;
   }
   serializeJson(ConfigFileJson, cfg_file);
   cfg_file.close();
-  LOG(F("saved config file!!!"));
 }
 void setValue(const String key, const String value, bool init = false){
   setValueFlag = true;
   if(changeFlag[key] == true)
     return;
   // LOG(String("set: ")+ key + ": "+value);
-  ConfigFileJson[key].set(value);
+  if(!(value == ""))
+  ConfigFileJson[key]=value;
 
-  // nếu là không phải init thì bất cờ change để handle chạy
+  // nếu là không phải init thì bật cờ change để handle chạy
   if(!init)
     changeFlag[key] = true;
   // LOG(String("GET: ")+ key + ": "+ConfigFileJson[key].as<char*>());

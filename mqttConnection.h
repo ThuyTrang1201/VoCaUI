@@ -46,6 +46,9 @@ inComeData.to<JsonObject>();
   publicMqtt(getPage(),String(ConfigFileJson["mqttUser"].as<char *>()) +"/"+NAME_DEVICE+ "/dashboard");
 }
 void mqttHandle(){
+  if(!mqttClient.connected()){
+    initMqttConnection();
+    }
 
     mqttClient.poll();
 }

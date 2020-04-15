@@ -24,6 +24,7 @@ void handleChangeValueEvent(){
 		}
 
 		if(sendFlag){
+			saveConfigFile();
 			publicMqtt(String(ConfigFileJson.as<String>()),String(ConfigFileJson["mqttUser"].as<String>()) +"/"+NAME_DEVICE +"/tx");
 
 		}
