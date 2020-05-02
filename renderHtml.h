@@ -7,22 +7,14 @@
 
 String responeBuf = "";
 String listMenu = "";
-
-
-// void render_inputText(String id, String label, bool newline = true){
-//     responeBuf += String("<label>") + label + "</label>\n";
-//     responeBuf += String("<input type=\"text\" id=\"")+id+"\""+ " onblur=\"sendData(this)\""
-//     + ">";
-//     if(newline){
-//      responeBuf +="<br>";
-//     }
-// }
-void render_inputText(String id, String label, String value, bool newline = true, onValueChange func = [](String val){}) {
-    responeBuf += String("<label>") + label + "</label>\n";
-    responeBuf += String("<input type=\"text\" id=\"") + id + "\"" + " onchange=\"sendData(this)\"" +
-        " value=\"" + value + "\"" +
-        ">";
-
+void render_inputText(String id, String label, bool newline = true, onValueChange func = [](String val){}) {
+      responeBuf += emptyString
+    + "<div id='"+id+"' class='inptxt'>"
+    + "<label>" + label + "</label>"
+    + "<input type='text'>"
+    + "<button onclick=\"sdt('"+id+"',this.previousSibling.value)\">"
+    + "OK</button>"
+    +"</div>";
     std::pair < String, onValueChange > tmpPair(id, func);
     std::pair < String, bool > tmpPair2(id, false);
     changeFlag.insert(tmpPair2);
@@ -32,21 +24,14 @@ void render_inputText(String id, String label, String value, bool newline = true
         responeBuf += "<br>";
     }
 }
-void render_label(String id, String label, bool newline = true) {
-    responeBuf += String("<label>") + label + "</label>";
-    responeBuf += String("<label id=\"") + id + "\">" + "</label>\n";
-    if (newline) {
-        responeBuf += "<br>";
-    }
-}
-void render_reciveText(String id, String label, bool newline = true, onValueChange func = [](String val){}) {
-    responeBuf += String("<label>") + label + "</label>\n";
-    responeBuf += String("<input type=\"text\" id=\"") + id + "\"" +
-        "class=\"recive\"" +
-        " readonly" +
-        ">";
+void render_textView(String id, String label, bool newline = true) {
+      responeBuf += emptyString
+    + "<div id='"+id+"' class='txtvie'>"
+    + "<label>" + label + "</label>"
+    + "<input type='text' readonly>"
+    +"</div>";
 
-    std::pair < String, onValueChange > tmpPair(id, func);
+     std::pair < String, onValueChange > tmpPair(id, [](String val){});
     std::pair < String, bool > tmpPair2(id, false);
     changeFlag.insert(tmpPair2);
     listFunc.insert(tmpPair);
@@ -55,16 +40,21 @@ void render_reciveText(String id, String label, bool newline = true, onValueChan
         responeBuf += "<br>";
     }
 }
-void render_range(String id, String label, int min, int max, int step, bool newline = true, onValueChange func = [](String val){}) {
-    responeBuf += String("<label>") + label + " </label>\n";
-    responeBuf += String("<label></label>");
-    responeBuf += String("<input type=\"range\" id=\"") + id + "\"" +
-        "min=\'" + min + "\'" +
-        "max=\'" + max + "\'" +
-        "step=\'" + step + "\'" +
-        "onchange=\"sendData(this)\"" +
-        "oninput=\"this.previousSibling.innerHTML=this.value\"" +
-        ">";
+void render_range(String id, String label, int min, int max, int step, bool newline =true, onValueChange func = [](String val){}) {
+     responeBuf += emptyString
+                + "<div id='"+id+"' class='rng'>"
+                + "<label>" + label + "</label>"
+                + "<label></label>"
+                + "<input type='range'" +
+                    "min='" + min + "'" +
+                    "max='" + max + "'" +
+                    "step='" + step + "'" +
+                    "onchange=\"sdt('"+id+"',this.value); this.blur()\"" +
+                    "oninput=\"this.previousSibling.innerHTML=this.value\"" +
+                    ">"
+                +"</div>";
+
+       
 
     std::pair < String, onValueChange > tmpPair(id, func);
     std::pair < String, bool > tmpPair2(id, false);
@@ -86,7 +76,7 @@ void render_updatetButton(bool newline = true) {
 }
 void render_resetButton(bool newline = true) {
     String id = "reset";
-    responeBuf += String("<button type=\"button\" id=\"") + id + "\"" + " onclick=\"sendData(this)\"" +
+    responeBuf += String("<button type=\"button\" id=\"") + id + "\"" + " onclick=\"sdt('rst','')\"" +
         ">RESET</button>";
     if (newline) {
         responeBuf += "<br>";
@@ -94,46 +84,38 @@ void render_resetButton(bool newline = true) {
 }
 void render_formatButton(bool newline = true) {
     String id = "format";
-    responeBuf += String("<button type=\"button\" id=\"") + id + "\"" + " onclick=\"sendData(this)\"" +
+    responeBuf += String("<button type=\"button\" id=\"") + id + "\"" + " onclick=\"sdt('fmt','')\"" +
         ">FORMAT</button>";
     if (newline) {
         responeBuf += "<br>";
     }
 }
-void render_button(String id, String label, bool newline = true, onValueChange func = [](String val){}) {
+void render_button(String id, String label, onValueChange func = [](String val){}, bool newline = true) {
     setValue(id.c_str(),"",true);
-    responeBuf += String("<button type=\"button\" id=\"") + id + "\"" + " onclick=\"sendData(this)\">" +
-        label + "</button>";
-
+    responeBuf += emptyString
+    + "<div id='"+id+"' class='sglbtn'>"
+    + "<button onclick=\"sdt('"+id+"','"+label+"')\">"
+    + label
+    + "</button>"
+    +"</div>";
     std::pair < String, onValueChange > tmpPair(id, func);
     std::pair < String, bool > tmpPair2(id, false);
     changeFlag.insert(tmpPair2);
     listFunc.insert(tmpPair);
 
 
-    if (newline) {
-        responeBuf += "<br>";
-    }
-}
-void render_state(String id, String label, bool newline = true, onValueChange func = [](String val){}) {
-    setValue(id.c_str(),"",true);
-    responeBuf += String("<label>") + label + "</label>" +
-        "<input type=\"checkbox\" disabled=\"true\" id=\"" + id + "\">";
-
-    std::pair < String, onValueChange > tmpPair(id, func);
-    std::pair < String, bool > tmpPair2(id, false);
-    changeFlag.insert(tmpPair2);
-    listFunc.insert(tmpPair);
     if (newline) {
         responeBuf += "<br>";
     }
 }
 void render_switch(String id, String label, bool newline = true, onValueChange func = [](String val){}) {
     setValue(id.c_str(),"",true);
-    responeBuf += String("<label>") + label + "</label>" +
-        "<input type=\"checkbox\" id=\"" + id + "\"" +
-        " onclick=\"sendData(this)\"" +
-        "\">";
+    responeBuf += emptyString
+    + "<div id='"+id+"' class='swch'>"
+    + "<label>" + label + "</label>"
+    + "<input id = '_"+id+"' type='checkbox' onclick=\"sdt('"+id+"',this.checked.toString())\">"
+    + "<label for='_"+id+"'></label>"
+    +"</div>";
 
     std::pair < String, onValueChange > tmpPair(id, func);
     std::pair < String, bool > tmpPair2(id, false);
@@ -144,12 +126,37 @@ void render_switch(String id, String label, bool newline = true, onValueChange f
         responeBuf += "<br>";
     }
 }
+void render_state(String id, String label, bool newline = true) {
+    setValue(id.c_str(),"",true);
+    responeBuf += emptyString
+    + "<div id='"+id+"' class='state'>"
+    + "<label>" + label + "</label>"
+    + "<input  id = '_"+id+"' type='checkbox' disabled='disabled'>"
+    + "<label for='_"+id+"'></label>"
+    +"</div>";
+
+    std::pair < String, onValueChange > tmpPair(id, [](String val){});
+    std::pair < String, bool > tmpPair2(id, false);
+    changeFlag.insert(tmpPair2);
+    listFunc.insert(tmpPair);
+
+    if (newline) {
+        responeBuf += "<br>";
+    }
+}
+
 void render_TimePicker(String id, String label, bool newline = true, onValueChange func = [](String val){}) {
     setValue(id.c_str(),"",true);
-    responeBuf += String("<label>") + label + "</label><br>" +
-     +"<label>Giờ: </label>" +"<select class=\"hList\"></select>"
-      +"<label>Phút: </label>" +"<select class=\"mList\"></select>"  
-      +"<button onclick=\"sendData(this)\" class=\"timePicker\" id=\"" + id + "\">OK</button>";  
+
+      responeBuf += emptyString
+    + "<div id='"+id+"' class='tmpk'>"
+    + "<label>" + label + "</label><br>"
+    + "<label>Giờ: </label><select class='hLst'></select>"
+    + "<label>Phút: </label><select class='mLst'></select>"
+    +"<button onclick=\"var p=this.parentElement.children; var m = p[5];var h = p[3]; var v = parseInt(m.value) + h.value * 60; sdt('"+id+"',v)\">OK</button>"
+    +"</div>";
+
+
      std::pair < String, onValueChange > tmpPair(id, func);
     std::pair < String, bool > tmpPair2(id, false);
     changeFlag.insert(tmpPair2);
@@ -158,9 +165,15 @@ void render_TimePicker(String id, String label, bool newline = true, onValueChan
         responeBuf += "<br>";
     }
 }
-void begin_menu(String name) {
-    listMenu += "<li onclick=\"onMenuClick(\'" + name + "\')\"><a href=\"#\" >" + name + "</a></li>";
-    responeBuf += "<div id=\"" + name + "\">";
+void begin_menu(String id, String name, onValueChange func = [](String val){}) {
+    setValue(id.c_str(),"",true);
+    listMenu += "<li onclick=\"oMnClk('" + id + "','')\"><a href=\"#\" >" + name + "</a></li>";
+    responeBuf += "<div class='mnu' id=\"" + id + "\" style='display: none'>"
+    + "<label>" + name + "</label><br>";
+    std::pair < String, onValueChange > tmpPair(id, func);
+    std::pair < String, bool > tmpPair2(id, false);
+    changeFlag.insert(tmpPair2);
+    listFunc.insert(tmpPair);
 }
 void end_menu() {
     responeBuf += "</div>";
@@ -169,7 +182,7 @@ const char * getPage() {
     static bool gotPage = false;
     if (gotPage)
         return responeBuf.c_str();
-    responeBuf += "<div id=\"menu\"><ul>";
+    responeBuf += "<div class='lmnu' style='display: none' onclick='hidelmnu();'><ul>";
     responeBuf += listMenu;
     responeBuf += "</ul></div>";
     responeBuf += last_part_page;
@@ -179,16 +192,16 @@ const char * getPage() {
 void render_init(String title) {
     responeBuf.reserve(SIZE_HTML);
     responeBuf += first_part_page + title + mid_part_page;
-    begin_menu("wifi");
-    render_label("time", "T.Gian: ");
-    render_inputText("staid", "Tên Wifi", ConfigFileJson["staid"], true);
-    render_inputText("stapass", "Mật Khẩu", ConfigFileJson["stapass"], true);
+    begin_menu("wifi","wifi");
+    render_textView("time", "T.Gian: ");
+    render_inputText("staid", "Tên Wifi", true);
+    render_inputText("stapass", "Mật Khẩu", true);
     end_menu();
-    begin_menu("setting");
-    render_inputText("mqttAddr", "Địa chỉ MQTT", ConfigFileJson["mqttAddr"], true);
-    render_inputText("mqttPort", "Cổng MQTT", ConfigFileJson["mqttPort"], true);
-    render_inputText("mqttUser", "Tên MQTT", ConfigFileJson["mqttUser"], true);
-    render_inputText("mqttPass", "Mật Khẩu MQTT", ConfigFileJson["mqttPass"], true);
+    begin_menu("setting","setting");
+    render_inputText("mqttAddr", "Địa chỉ MQTT", true);
+    render_inputText("mqttPort", "Cổng MQTT", true);
+    render_inputText("mqttUser", "Tên MQTT", true);
+    render_inputText("mqttPass", "Mật Khẩu MQTT", true);
     render_resetButton(false);
     render_formatButton(false);
     render_updatetButton();

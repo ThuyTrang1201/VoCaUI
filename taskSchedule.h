@@ -12,7 +12,7 @@ void addTaskEvent(int id, taskScheduleCallback func){
 }
 void handlerTaskSchedule(){
 
-	uint32_t epochTime = ConfigFileJson["time"];
+	uint32_t epochTime = String(getValue("time")).toInt();;
 
 	uint32_t dayW = ((epochTime  / 86400L) + 4 ) % 7; //0 is Sunday
 	uint32_t hour = (epochTime  % 86400L) / 3600; 

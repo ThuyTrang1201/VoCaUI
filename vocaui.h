@@ -12,27 +12,28 @@ void initVoCa(){
 	initWifi();
 	initMqttConnection();
 }
+
 void handleChangeValueEvent(){
 	bool sendFlag = false;
 		
 		for (std::pair < String, onValueChange > func : listFunc) {	
 			if(changeFlag[func.first] == true){
-				func.second(ConfigFileJson[func.first]);
+				func.second(getValue(func.first.c_str()));
 				sendFlag = true;
 				changeFlag[func.first] = false;
 			}
 		}
 
-		if(sendFlag){
-			saveConfigFile();
-			publicMqtt(String(ConfigFileJson.as<String>()),String(ConfigFileJson["mqttUser"].as<String>()) +"/"+NAME_DEVICE +"/tx");
+		// if(sendFlag){
+		// 	saveConfigFile();
+		// 	publicMqtt(String(getRoot()),String(getValue("mqttUser")) +"/"+NAME_DEVICE +"/tx");
 
-		}
+		// }
 		
 }
 void voCaHandle(){
 	if(millis() - vocaTimer > 10){
-		mqttHandle();
+//		mqttHandle();
 		wifiHandle();
 		handlerTaskSchedule();
 		handleChangeValueEvent();
