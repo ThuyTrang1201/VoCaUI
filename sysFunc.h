@@ -13,7 +13,7 @@ std::map < String, onValueChange > listFunc;
 std::map < String, bool > changeFlag ;
 std::map < String, String > ConfigContent;
 
-char bufContent[10000];
+char bufContent[10000]={0};
 void setValue(String key, String value, bool init = false);
 const char* getRoot();
 void config2Json() {

@@ -124,6 +124,7 @@ function onloadDone() {
         }
     }
     sdt('all', '');
+    document.getElementsByClassName('mnu')[2].style.display = 'block';// hiển thị menu đầu tiên
     ajax();
 }
 window.onload = onloadDone;

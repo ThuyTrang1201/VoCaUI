@@ -24,16 +24,16 @@ void handleChangeValueEvent(){
 			}
 		}
 
-		// if(sendFlag){
-		// 	saveConfigFile();
-		// 	publicMqtt(String(getRoot()),String(getValue("mqttUser")) +"/"+NAME_DEVICE +"/tx");
+		if(sendFlag){
+			saveConfigFile();
+			publicMqtt(String(getRoot()),String(getValue("mqttUser")) +"/"+NAME_DEVICE +"/tx");
 
-		// }
+		}
 		
 }
 void voCaHandle(){
 	if(millis() - vocaTimer > 10){
-//		mqttHandle();
+		// mqttHandle();
 		wifiHandle();
 		handlerTaskSchedule();
 		handleChangeValueEvent();

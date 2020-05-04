@@ -15,7 +15,7 @@ ESP8266HTTPUpdateServer httpUpdater;
 NTPClient timeClient(ntpUDP, "1.asia.pool.ntp.org",3600*7);
 
 bool gotTime = false;
-
+bool apFlag=true;
 void initWifi(){
   pinMode(LED_PIN, OUTPUT);
   WiFi.disconnect();
@@ -41,13 +41,13 @@ void initWifi(){
   }
 
  server.on("/",[](){
-  server.send(200, "text/html", getPage());
+  server.send(200, "text/html",getPage());
  });
  server.on("/script.js",[](){
-  server.send(200, F("text/html"), java_script);
+  server.send(200, "text/html", java_script);
  });
  server.on("/style.css",[](){
-  server.send(200, F("text/html"), menu_css);
+  server.send(200, "text/html", menu_css);
  });
  server.on("/recv",[](){
  
@@ -67,17 +67,18 @@ void initWifi(){
     }
     setValue(key.c_str(),value.c_str());
     digitalWrite(LED_PIN, !digitalRead(LED_PIN));
-    LOG(key+": "+value+ " wifi");
+    LOG(key+": "+value+ " --wifi");
   }
   saveConfigFile();
   server.send(200, "text/html", "");
  });
  server.on("/trans",[](){
+
   if(setValueFlag == false){ // Chưa có dữ liệu mới
     server.send(504, "text/html", "");
     return;
   }
-
+String tmp = getRoot();
     server.send(200, "application/json", getRoot());
     digitalWrite(LED_PIN, !digitalRead(LED_PIN));
     setValueFlag=false;
@@ -86,7 +87,7 @@ void initWifi(){
   server.begin();
 
 
-  while (WiFi.status() != WL_CONNECTED )
+  while (WiFi.status() != WL_CONNECTED)
   {
     server.handleClient();
     digitalWrite(LED_PIN, !digitalRead(LED_PIN));
@@ -98,6 +99,10 @@ digitalWrite(LED_PIN, !digitalRead(LED_PIN));
          digitalWrite(LED_PIN, !digitalRead(LED_PIN));
 
   }
+     
+// if(WiFi.status() == WL_CONNECTED){
+//   apFlag=false;
+// }
       LOG(F("Got IP: "));
     LOG(WiFi.localIP());
   timeClient.begin();

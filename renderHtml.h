@@ -8,6 +8,7 @@
 String responeBuf = "";
 String listMenu = "";
 void render_inputText(String id, String label, bool newline = true, onValueChange func = [](String val){}) {
+      setValue(id.c_str(),"",true);
       responeBuf += emptyString
     + "<div id='"+id+"' class='inptxt'>"
     + "<label>" + label + "</label>"
@@ -25,6 +26,7 @@ void render_inputText(String id, String label, bool newline = true, onValueChang
     }
 }
 void render_textView(String id, String label, bool newline = true) {
+      setValue(id.c_str(),"",true);
       responeBuf += emptyString
     + "<div id='"+id+"' class='txtvie'>"
     + "<label>" + label + "</label>"
@@ -41,6 +43,7 @@ void render_textView(String id, String label, bool newline = true) {
     }
 }
 void render_range(String id, String label, int min, int max, int step, bool newline =true, onValueChange func = [](String val){}) {
+     setValue(id.c_str(),"",true);
      responeBuf += emptyString
                 + "<div id='"+id+"' class='rng'>"
                 + "<label>" + label + "</label>"
@@ -83,6 +86,7 @@ void render_resetButton(bool newline = true) {
     }
 }
 void render_formatButton(bool newline = true) {
+
     String id = "format";
     responeBuf += String("<button type=\"button\" id=\"") + id + "\"" + " onclick=\"sdt('fmt','')\"" +
         ">FORMAT</button>";
