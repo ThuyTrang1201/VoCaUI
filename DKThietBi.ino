@@ -3,7 +3,7 @@
 #include "vocaui.h"
 #include <Ticker.h>
 #include <Adafruit_NeoPixel.h>
-// #include "RTClib.h"
+#include "RTClib.h"
 Adafruit_NeoPixel pixels(60, D3, NEO_GRB + NEO_KHZ800);
 int BRIGHTNESS = 100;
 uint32_t curSecondPoint = 0;
@@ -19,7 +19,8 @@ uint32_t seconds;
 uint32_t hours;
 uint32_t minute;
 bool manTime = false;
-// RTC_DS1307 rtc;
+RTC_DS1307 rtc;
+RTC_Millis srtc;
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
@@ -27,92 +28,92 @@ void setup() {
   // loadConfigFile(true); // for dev
   loadConfigFile(false); // for using
   render_init("Điều Khiển Led Full");
-  begin_menu("menu1", "Hiệu Ứng",[](String val){
-    manTime=false;
+  begin_menu("menu1", "Hiệu Ứng", [](String val) {
+    manTime = false;
   });
- render_button("hu1","Hiệu Ứng 1",[](String val){
-        for (int i = pixels.numPixels(); i >= 0; i--) {
-          pixels.setPixelColor(i, 255, 0, 0);
-          pixels.show();
-          delay(20);
-        }
-        pixels.clear();
-        for (int i = pixels.numPixels(); i >= 0; i--) {
-          pixels.setPixelColor(i, 0, 255, 0);
-          pixels.show();
-          delay(20);
-        }
-        pixels.clear();
-        for (int i = pixels.numPixels(); i >= 0; i--) {
-          pixels.setPixelColor(i, 0, 0, 255);
-          pixels.show();
-          delay(20);
-        }
-        pixels.clear();
+  render_button("hu1", "Hiệu Ứng 1", [](String val) {
+    for (int i = pixels.numPixels(); i >= 0; i--) {
+      pixels.setPixelColor(i, 255, 0, 0);
+      pixels.show();
+      delay(20);
+    }
+    pixels.clear();
+    for (int i = pixels.numPixels(); i >= 0; i--) {
+      pixels.setPixelColor(i, 0, 255, 0);
+      pixels.show();
+      delay(20);
+    }
+    pixels.clear();
+    for (int i = pixels.numPixels(); i >= 0; i--) {
+      pixels.setPixelColor(i, 0, 0, 255);
+      pixels.show();
+      delay(20);
+    }
+    pixels.clear();
   });
-  render_button("hu2","Hiệu Ứng 2",[](String val){
+  render_button("hu2", "Hiệu Ứng 2", [](String val) {
     for (int i = 0; i < 50; ++i)
     {
-     for (int i = pixels.numPixels(); i >= 0; i--) {
-    pixels.setPixelColor(i,random(255), random(255), random(255));
-   
-  }
-   pixels.show();
-   delay(100);
+      for (int i = pixels.numPixels(); i >= 0; i--) {
+        pixels.setPixelColor(i, random(255), random(255), random(255));
+
+      }
+      pixels.show();
+      delay(100);
     }
-         
 
-           pixels.clear();
-  });
-  render_button("hu3","Hiệu Ứng 3",[](String val){
-        for (int i = pixels.numPixels(); i >= 0; i--) {
-          setColor(i, 255, -1, -1);
-          pixels.show();
-          delay(20);
-        }
-        for (int i = pixels.numPixels(); i >= 0; i--) {
-          setColor(i, -1, 255, -1);
-          pixels.show();
-          delay(20);
-        }
-        for (int i = pixels.numPixels(); i >= 0; i--) {
-          setColor(i, -1, -1, 255);
-          pixels.show();
-          delay(20);
-        }
 
-        for (int i = pixels.numPixels(); i >= 0; i--) {
-          setColor(i, 0, -1, -1);
-          pixels.show();
-          delay(20);
-        }
-        for (int i = pixels.numPixels(); i >= 0; i--) {
-          setColor(i, -1, 0, -1);
-          pixels.show();
-          delay(20);
-        }
-        for (int i = pixels.numPixels(); i >= 0; i--) {
-          setColor(i, -1, -1, 0);
-          pixels.show();
-          delay(20);
-        }
-        pixels.clear();
+    pixels.clear();
   });
-  
+  render_button("hu3", "Hiệu Ứng 3", [](String val) {
+    for (int i = pixels.numPixels(); i >= 0; i--) {
+      setColor(i, 255, -1, -1);
+      pixels.show();
+      delay(20);
+    }
+    for (int i = pixels.numPixels(); i >= 0; i--) {
+      setColor(i, -1, 255, -1);
+      pixels.show();
+      delay(20);
+    }
+    for (int i = pixels.numPixels(); i >= 0; i--) {
+      setColor(i, -1, -1, 255);
+      pixels.show();
+      delay(20);
+    }
+
+    for (int i = pixels.numPixels(); i >= 0; i--) {
+      setColor(i, 0, -1, -1);
+      pixels.show();
+      delay(20);
+    }
+    for (int i = pixels.numPixels(); i >= 0; i--) {
+      setColor(i, -1, 0, -1);
+      pixels.show();
+      delay(20);
+    }
+    for (int i = pixels.numPixels(); i >= 0; i--) {
+      setColor(i, -1, -1, 0);
+      pixels.show();
+      delay(20);
+    }
+    pixels.clear();
+  });
+
 
   end_menu();
- begin_menu("menu2", "developer",[](String val){
-  manTime=true;
-  });  
+  begin_menu("menu2", "developer", [](String val) {
+    manTime = true;
+  });
 
- render_inputText("gio","gio",[](String val){
+  render_inputText("gio", "gio", [](String val) {
 
   });
 
- render_inputText("phut","phut",[](String val){
+  render_inputText("phut", "phut", [](String val) {
 
   });
- render_inputText("giay","giay",[](String val){
+  render_inputText("giay", "giay", [](String val) {
 
   });
   end_menu();
@@ -121,67 +122,65 @@ void setup() {
   //====
 
   pixels.begin();
-    for (int i = pixels.numPixels(); i >= 0; i--) {
+  for (int i = pixels.numPixels(); i >= 0; i--) {
     pixels.setPixelColor(i, 255, 0, 0);
     pixels.show();
-    delay(20);
+    delay(10);
   }
   pixels.clear();
   for (int i = pixels.numPixels(); i >= 0; i--) {
     pixels.setPixelColor(i, 0, 255, 0);
     pixels.show();
-    delay(20);
+    delay(10);
   }
   pixels.clear();
   for (int i = pixels.numPixels(); i >= 0; i--) {
     pixels.setPixelColor(i, 0, 0, 255);
     pixels.show();
-    delay(20);
+    delay(10);
   }
   pixels.clear();
-pixels.show();
-  // rtc.begin();
+  pixels.show();
 
-  while(millis()<30000){
+
+  rtc.begin();
+
+  while (millis() < 35000) {
     for (int i = pixels.numPixels(); i >= 0; i--) {
-    pixels.setPixelColor(i,random(255), random(255), random(255));
-   
+      pixels.setPixelColor(i, random(BRIGHTNESS), random(BRIGHTNESS), random(BRIGHTNESS));
+    }
+    pixels.show();
+    voCaHandle();
+    if (gotTime) {
+      rtc.adjust(DateTime(timeClient.getEpochTime()));
+      timeClient.end();
+     
+      break;
+    }
+    delay(50);
   }
-   pixels.show();
-      voCaHandle();
-
-  delay(50);
-  }
+ gotTime=true;
+  srtc.begin(rtc.now());
 }
 
-uint32_t count=0;
-uint32_t sssss=millis();
+uint32_t count = 0;
+uint32_t sssss = millis();
 
 void loop() {
   // put your main code here, to run repeatedly:
 
   voCaHandle();
-// DateTime now = rtc.now();
-  if(!manTime){
-      // seconds = now.second();
-      // hours = now.hour();
-      // minute = now.minute();
-      seconds = timeClient.getSeconds();
-      hours = timeClient.getHours();
-      minute = timeClient.getMinutes();
-  }else{
-    seconds = String(getValue("giay")).toInt();
-    hours = String(getValue("gio")).toInt();
-    minute = String(getValue("phut")).toInt();
+  DateTime now = srtc.now();
+  seconds = now.second();
+  hours = now.hour();
+  if(hours>=12)
+  hours-=12;
+  minute = now.minute();
 
-
-  }
-
-
-
-    if (lastSeconds != seconds) {
-      curSecondPoint = pixels.numPixels() - seconds - 1;
-      fadeSecond.attach_ms(75, fadeSecondFunc);
+  if (lastSeconds != seconds) {
+    LOG(String("thoi gian: ") + hours + ":" + minute + ":" + seconds);
+    curSecondPoint = pixels.numPixels() - seconds - 1;
+    fadeSecond.attach_ms(75, fadeSecondFunc);
 
     //   setColor(curSecondPoint, BRIGHTNESS, -1, -1);
     // for (int i = pixels.numPixels(); i >= 0; i--) {
@@ -190,38 +189,38 @@ void loop() {
     // }
     //  pixels.show();
 
-       uint32_t curMinPoint = pixels.numPixels() - minute - 1;
-      handleMinutePoint(curMinPoint);
- 
+    uint32_t curMinPoint = pixels.numPixels() - minute - 1;
+    handleMinutePoint(curMinPoint);
 
-      int32_t curHoursPoint = pixels.numPixels() - 1 - hours * 5 - minute / 12;
-      handleHoursPoint(curHoursPoint);
-      pixels.show();
-      lastSeconds = seconds;
-    }
+
+    int32_t curHoursPoint = pixels.numPixels() - 1 - hours * 5 - minute / 12;
+    handleHoursPoint(curHoursPoint);
+    pixels.show();
+    lastSeconds = seconds;
+  }
 
 }
-void handleMinutePoint(int32_t curPoint){
-      setColor(curPoint, -1, BRIGHTNESS, -1);
-      for (int i = pixels.numPixels(); i >= 0; i--) {
-      if(i!=curPoint)
-          setColor(i, -1, 0, -1);
-    }
-     pixels.show();
+void handleMinutePoint(int32_t curPoint) {
+  setColor(curPoint, -1, BRIGHTNESS, -1);
+  for (int i = pixels.numPixels(); i >= 0; i--) {
+    if (i != curPoint)
+      setColor(i, -1, 0, -1);
+  }
+  pixels.show();
 }
-void handleHoursPoint(int32_t curPoint){
-      setColor(curPoint, -1, -1, BRIGHTNESS);
-      for (int i = pixels.numPixels(); i >= 0; i--) {
-      if(i!=curPoint)
-          setColor(i, -1, -1, 0);
-    }
-     pixels.show();
+void handleHoursPoint(int32_t curPoint) {
+  setColor(curPoint, -1, -1, BRIGHTNESS);
+  for (int i = pixels.numPixels(); i >= 0; i--) {
+    if (i != curPoint)
+      setColor(i, -1, -1, 0);
+  }
+  pixels.show();
 }
 void fadeSecondFunc() {
   static int step = 0;
   static uint32_t preSecondPoint = pixels.numPixels();
   setColor(curSecondPoint, pixels.gamma8(BRIGHTNESS * step / 13), -1, -1);
-  if(preSecondPoint<pixels.numPixels())
+  if (preSecondPoint < pixels.numPixels())
     setColor(preSecondPoint, pixels.gamma8(BRIGHTNESS * (13 - step) / 13), -1, -1);
   pixels.show();
   step++;
@@ -229,10 +228,10 @@ void fadeSecondFunc() {
     step = 0;
     preSecondPoint = curSecondPoint;
     for (int i = pixels.numPixels(); i >= 0; i--) {
-      if(i!=curSecondPoint)
-          setColor(i, 0, -1, -1);
+      if (i != curSecondPoint)
+        setColor(i, 0, -1, -1);
     }
-     pixels.show();
+    pixels.show();
     fadeSecond.detach();
   }
 
