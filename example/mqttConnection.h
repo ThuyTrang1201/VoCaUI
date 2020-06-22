@@ -26,10 +26,10 @@ void initMqttConnection() {
     json2MapInComeData(tmp);
     setValue(inComeData["id"], inComeData["value"]);
     if (inComeData["id"] == "all") {
-      publicMqtt(String(getRoot()), String(getValue("mqttUser")) + "/" + NAME_DEVICE + "/tx",false);
+      publicMqtt(String(getRoot()), String(getValue("mqttUser")) + "/" + NAME_DEVICE +"_"+getValue("deviceId") + "/tx",false);
 
     } else if (inComeData["id"] == "ui") {
-      publicMqtt(String(getPage()), String(getValue("mqttUser")) + "/" + NAME_DEVICE + "/dashboard",true);
+      publicMqtt(String(getPage()), String(getValue("mqttUser")) + "/" + NAME_DEVICE +"_"+getValue("deviceId")+ "/dashboard",true);
 
 
     }
@@ -38,7 +38,7 @@ void initMqttConnection() {
   String clientId = NAME_DEVICE;
   clientId += String(random(0xffff), HEX);
   mqttClient.connect(clientId.c_str(), getValue("mqttUser"), getValue("mqttPass"));
-  mqttClient.subscribe((String(getValue("mqttUser")) + "/" + NAME_DEVICE + "/rx/#").c_str(), 1);
+  mqttClient.subscribe((String(getValue("mqttUser")) + "/" + NAME_DEVICE +"_"+getValue("deviceId")+ "/rx/#").c_str(), 1);
 
 
   isPubDasboard = false;
@@ -52,7 +52,7 @@ void mqttHandle() {
     return;
   }
   if (!isPubDasboard) {
-    publicMqtt(String(getPage()), String(getValue("mqttUser")) + "/" + NAME_DEVICE + "/dashboard",true);
+    publicMqtt(String(getPage()), String(getValue("mqttUser")) + "/" + NAME_DEVICE +"_"+getValue("deviceId") + "/dashboard",true);
     isPubDasboard = true;
   }
 

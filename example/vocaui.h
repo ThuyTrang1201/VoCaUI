@@ -33,21 +33,30 @@ void handleChangeValueEvent() {
 }
 void voCaHandle() {
   if (millis() - vocaTimer > 30) {
+    vocaTimer = millis();
+    // LOG("111");
     delay(5);
     wifiHandle();
     delay(5);
-    mqttHandle();
-    delay(5);
+    // LOG("222");
+
+    // LOG("333");
     if(gotTime)
     {
       handlerTaskSchedule();
       delay(5);
+      // LOG("444");
     }
+    // LOG("555");
     handleChangeValueEvent();
     delay(5);
+    // LOG("666");
     handleMail();
     delay(5);
-    vocaTimer = millis();
+    mqttHandle();
+    delay(5);
+    // LOG("777");
+
   }
 
 }

@@ -43,7 +43,7 @@ void render_textView(String id, String label, bool newline = true) {
     responeBuf += "<br>";
   }
 }
-void render_range(String id, String label, int min = 0, int max = 100, int step = 1, bool newline = true, onValueChange func = [](String val) {}) {
+void render_range(String id, String label, int min=0, int max=100, int step=1, bool newline = true, onValueChange func = [](String val) {}) {
   setValue(id.c_str(), "", true);
   responeBuf += emptyString
                 + "<div id='" + id + "' class='rng'>"
@@ -213,7 +213,7 @@ void render_init(String title) {
   render_inputText("tknMail", "Token Mail", true);
   render_inputText("user", "T.Khoản VoCa", true);
   render_inputText("pass", "Mật Khẩu VoCa", true);
-
+  
   render_resetButton(false);
   render_formatButton(false);
   render_updatetButton();
@@ -221,10 +221,7 @@ void render_init(String title) {
   begin_menu("mail", "Quản Lý Mail");
 
   render_inputText("desMail", "Mail", true);
-  render_textView("mailCnt", "Mail đang chờ gửi", true);
-  render_button("clearMail", "Xóa", true , [](String val) {
-    setValue("mailCnt", "null");
-  });
+    render_textView("mailCnt", "Mail đang chờ gửi", true);
   render_inputText("tknMail", "Token Mail", true);
 
   end_menu();
@@ -239,6 +236,7 @@ void render_init(String title) {
 
     setValue("upTime", String(millis() / 1000));
   });
+  render_inputText("deviceId", "id thiết bị: ");
   render_textView("localIP", "Địa chỉ IP: ");
   render_textView("upTime", "Up Time: ");
   end_menu();

@@ -1,6 +1,5 @@
 #ifndef WIFI
 #define WIFI
-#define COUNT_CHECK_INTERNET 5
 #define DEFAULT_APID "VOCAUI"
 #define DEFAULT_APPASS "12345678"
 #include "sysDefine.h"
@@ -19,7 +18,6 @@ CLIENT vocaClient;
 ESP8266WebServer server(80);
 ESP8266HTTPUpdateServer httpUpdater;
 bool gotTime = false;
-uint8_t checkInternet = 0;
 void initWifi() {
   server.on("/", []() {
     server.send(200, "text/html", getPage());
@@ -56,17 +54,17 @@ void initWifi() {
   server.on("/trans", []() { // server truyền dữ liệu
 
 
-
+   
 
     String key = server.argName(0);
     String value = server.arg(0);
     uint32_t cToken = 0;
-    if (key == "tokn") {
-      cToken = value.toInt();
+    if(key == "tokn"){
+      cToken=value.toInt();
     }
-    server.sendHeader("tokn", String(countSetValue));
+    server.sendHeader("tokn",String(countSetValue));
 
-    if (cToken == countSetValue) { // Chưa có dữ liệu mới
+    if (cToken== countSetValue) { // Chưa có dữ liệu mới
       server.send(504, "text/html", "");
       return;
     }
@@ -95,16 +93,15 @@ void initWifi() {
       && checkKey("appass")) {
     WiFi.softAP(getValue("apid"), getValue("appass"));
   } else {
-    WiFi.softAP(String(DEFAULT_APID) + NAME_DEVICE, DEFAULT_APPASS);
+    WiFi.softAP(String(DEFAULT_APID) + NAME_DEVICE +"_"+getValue("deviceId"), DEFAULT_APPASS);
   }
 
 #ifndef ETHERNET
-  WiFi.hostname(NAME_DEVICE);
-  WiFi.macAddress(macAddr);
-  if (checkKey("staid")
+    WiFi.hostname(String(NAME_DEVICE) +"_"+getValue("deviceId"));
+    WiFi.macAddress(macAddr);
+    if (checkKey("staid")
       && checkKey("stapass")) {
-    WiFi.begin(getValue("staid"), getValue("stapass"));
-  }
+    WiFi.begin(getValue("staid"), getValue("stapass"));}
 #else
   SPI.begin();
   Ethernet.init(D4);
@@ -114,7 +111,7 @@ void initWifi() {
 #endif
 
 }
-uint32_t getEpochTime() {
+uint32_t getEpochTime(){
   vocaClient.stop();
   if (vocaClient.connect("www.ngoinhaiot.com", 80)) {
 
@@ -137,7 +134,7 @@ uint32_t getEpochTime() {
   vocaClient.stop();
   return data.toInt();
 }
-uint32_t calcEpochTime() {
+uint32_t calcEpochTime(){
 
   // int32_t delta = (millis() - epochTimeTmp);
   // if(!gotTime)
@@ -148,27 +145,20 @@ uint32_t calcEpochTime() {
   //     epochTime+=delta/1000;
   //   }
   // epochTimeTmp=millis();
-  // epochTime = (millis() - epochTimeTmp)/1000;
-  return epochTime +  (millis() - epochTimeTmp) / 1000 + 3600 * 7;
+// epochTime = (millis() - epochTimeTmp)/1000;
+  return epochTime +  (millis() - epochTimeTmp)/1000 + 3600*7;
 }
-uint32_t pingTimer = millis();
 void wifiHandle() {
-  server.handleClient();
-  if (millis() - pingTimer > 10000) {
-    pingTimer = millis();
-    epochTime = getEpochTime();
-    if (epochTime > 0) {
-      gotTime = true;
-      checkInternet = 0;
-      epochTimeTmp = millis();
-    } else {
-      if (++checkInternet > COUNT_CHECK_INTERNET)
-        ESP.reset();
+      server.handleClient();
+      if(!gotTime){
+           epochTime = getEpochTime();
+           if(epochTime > 0){
+             gotTime = true;
 
-
-    }
-  }
-
+            epochTimeTmp = millis();
+           }           
+      }
+   
 }
 
 #endif
