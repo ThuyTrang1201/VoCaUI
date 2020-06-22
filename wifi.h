@@ -1,5 +1,6 @@
 #ifndef WIFI
 #define WIFI
+#define COUNT_CHECK_INTERNET 5
 #define DEFAULT_APID "VOCAUI"
 #define DEFAULT_APPASS "12345678"
 #include "sysDefine.h"
@@ -7,46 +8,27 @@
 #include "renderHtml.h"
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPUpdateServer.h>
-#include <NTPClient.h>
-#include <WiFiUdp.h>
-WiFiUDP ntpUDP;
+#ifdef ETHERNET
+#include <SPI.h>
+#include <Ethernet2.h>
+#define CLIENT EthernetClient
+#else
+#define CLIENT WiFiClient
+#endif
+CLIENT vocaClient;
 ESP8266WebServer server(80);
 ESP8266HTTPUpdateServer httpUpdater;
-NTPClient timeClient(ntpUDP, "1.asia.pool.ntp.org", 3600 * 7);
-
 bool gotTime = false;
+uint8_t checkInternet = 0;
 void initWifi() {
-  pinMode(LED_PIN, OUTPUT);
-  WiFi.disconnect();
-  WiFi.mode(WIFI_AP_STA);
-  if (checkKey("apid")
-      && checkKey("appass")) {
-    LOG(String("AP id: ") + getValue("apid"));
-    LOG(String("AP pass: ") + getValue("appass"));
-    WiFi.softAP(getValue("apid"), getValue("appass"));
-  } else {
-
-    LOG(F("not found AP info, use default value"));
-    WiFi.softAP(String(DEFAULT_APID) + NAME_DEVICE, DEFAULT_APPASS);
-  }
-
-  if (checkKey("staid")
-      && checkKey("stapass")) {
-    LOG(String("STA id: ") + getValue("staid"));
-    LOG(String("STA pass: ") + getValue("stapass"));
-    WiFi.begin(getValue("staid"), getValue("stapass"));
-  } else {
-    LOG(F("not found STA info, can't begin it"));
-  }
-
   server.on("/", []() {
     server.send(200, "text/html", getPage());
   });
   server.on("/script.js", []() {
-    server.send(200, "text/html", java_script);
+    server.send(200, "text/javascript", java_script);
   });
   server.on("/style.css", []() {
-    server.send(200, "text/html", menu_css);
+    server.send(200, "text/css", menu_css);
   });
   server.on("/recv", []() {
 
@@ -65,51 +47,128 @@ void initWifi() {
         setValue("", "");
       }
       setValue(key.c_str(), value.c_str());
-      digitalWrite(LED_PIN, !digitalRead(LED_PIN));
-      LOG(key + ": " + value + " --wifi");
     }
     saveConfigFile();
+
+
     server.send(200, "text/html", "");
   });
-  server.on("/trans", []() {
+  server.on("/trans", []() { // server truyền dữ liệu
 
-    if (setValueFlag == false) { // Chưa có dữ liệu mới
+
+
+
+    String key = server.argName(0);
+    String value = server.arg(0);
+    uint32_t cToken = 0;
+    if (key == "tokn") {
+      cToken = value.toInt();
+    }
+    server.sendHeader("tokn", String(countSetValue));
+
+    if (cToken == countSetValue) { // Chưa có dữ liệu mới
       server.send(504, "text/html", "");
       return;
     }
     String tmp = getRoot();
+
     server.send(200, "application/json", getRoot());
-    digitalWrite(LED_PIN, !digitalRead(LED_PIN));
-    setValueFlag = false;
   });
   httpUpdater.setup(&server);
   server.begin();
 
+  randomSeed(String(getValue("uptime")).toInt());
+  uint8_t macAddr[6];
+  for (uint8_t i = 0; i < 6; ++i) {
+    macAddr[i] = random(0xFB, 0xff);
+  }
+  macAddr[0] = 0xDE;
+  macAddr[1] = 0xAD;
+  macAddr[2] = 0xBE;
+  macAddr[3] = 0xEF;
+  macAddr[4] = 0xFE;
+  //  macAddr[5]=0xED;
 
-  while (WiFi.status() != WL_CONNECTED && millis()<20000)
-  {
-    server.handleClient();
-    digitalWrite(LED_PIN, !digitalRead(LED_PIN));
-    delay(50);
-    digitalWrite(LED_PIN, !digitalRead(LED_PIN));
-    delay(50);
-    digitalWrite(LED_PIN, !digitalRead(LED_PIN));
-    delay(50);
-    digitalWrite(LED_PIN, !digitalRead(LED_PIN));
-
+  WiFi.disconnect(true);
+  WiFi.mode(WIFI_AP_STA);
+  if (checkKey("apid")
+      && checkKey("appass")) {
+    WiFi.softAP(getValue("apid"), getValue("appass"));
+  } else {
+    WiFi.softAP(String(DEFAULT_APID) + NAME_DEVICE, DEFAULT_APPASS);
   }
 
-  LOG(F("Got IP: "));
-  LOG(WiFi.localIP());
-  timeClient.begin();
+#ifndef ETHERNET
+  WiFi.hostname(NAME_DEVICE);
+  WiFi.macAddress(macAddr);
+  if (checkKey("staid")
+      && checkKey("stapass")) {
+    WiFi.begin(getValue("staid"), getValue("stapass"));
+  }
+#else
+  SPI.begin();
+  Ethernet.init(D4);
+  Ethernet.begin(macAddr);
+  Serial.print("  DHCP assigned IP ");
+  Serial.println(Ethernet.localIP());
+#endif
 
-  digitalWrite(LED_PIN, HIGH);
 }
+uint32_t getEpochTime() {
+  vocaClient.stop();
+  if (vocaClient.connect("www.ngoinhaiot.com", 80)) {
 
+    vocaClient.println("GET /user/sysTime HTTP/1.1");
+
+    vocaClient.println(String("Name: ") + getValue("user"));
+    vocaClient.println(String("Password: ") + getValue("pass"));
+    vocaClient.println();
+    vocaClient.flush();
+  }
+  else {
+    return 0;
+  }
+  delay(1000);
+  String response = vocaClient.readString();
+  uint32_t resLen = response.length();
+  uint32_t idxCL = response.indexOf("Content-Length: ") + 16;
+  uint32_t contentLength = response.substring(idxCL, response.indexOf("\n", idxCL)).toInt();
+  String data = response.substring(resLen - contentLength);
+  vocaClient.stop();
+  return data.toInt();
+}
+uint32_t calcEpochTime() {
+
+  // int32_t delta = (millis() - epochTimeTmp);
+  // if(!gotTime)
+  //   return 0;
+  // if(delta<0){
+  //   epochTime+=(4294967295-epochTimeTmp+millis())/1000;
+  // }else{
+  //     epochTime+=delta/1000;
+  //   }
+  // epochTimeTmp=millis();
+  // epochTime = (millis() - epochTimeTmp)/1000;
+  return epochTime +  (millis() - epochTimeTmp) / 1000 + 3600 * 7;
+}
+uint32_t pingTimer = millis();
 void wifiHandle() {
   server.handleClient();
-  if (!gotTime) {
-    gotTime = timeClient.update();
+  if (millis() - pingTimer > 10000) {
+    pingTimer = millis();
+    epochTime = getEpochTime();
+    if (epochTime > 0) {
+      gotTime = true;
+      checkInternet = 0;
+      epochTimeTmp = millis();
+    } else {
+      if (++checkInternet > COUNT_CHECK_INTERNET)
+        ESP.reset();
+
+
+    }
   }
+
 }
+
 #endif

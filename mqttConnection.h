@@ -1,57 +1,62 @@
 #ifndef MQTT_CONNECTION
 #define MQTT_CONNECTION
 
-#include <ArduinoMqttClient.h>
+#include <PubSubClient.h>
 #include "html/sourceHtml.h"
 #include "sysFunc.h"
-WiFiClient wifiClient;
-MqttClient mqttClient(wifiClient);
+CLIENT cMQTT;
+PubSubClient mqttClient(cMQTT);
 std::map < String, String > inComeData;
 void json2MapInComeData(String json);
-void publicMqtt(String data, String topic){
-	mqttClient.beginMessage(topic, data.length(), true, 1, false);
-    mqttClient.print(data);
-    mqttClient.endMessage();
+bool isPubDasboard = false;
+void publicMqtt(String data, String topic, bool retain=false) {
+  mqttClient.beginPublish(topic.c_str(), data.length(), retain);
+  for(uint32_t i=0;i<data.length();i++)
+    mqttClient.print(data[i]);
+    mqttClient.endPublish();
 }
-void initMqttConnection(){
+void initMqttConnection() {
+  // cMQTT.setTimeout(500);
+  mqttClient.setServer(getValue("mqttAddr"), String(getValue("mqttPort")).toInt());
+  mqttClient.setCallback([](char* topic, byte * payload, unsigned int length) {
+    String tmp;
+    for (int i = 0; i < length; i++) {
+      tmp += (char)payload[i];
+    }
+    json2MapInComeData(tmp);
+    setValue(inComeData["id"], inComeData["value"]);
+    if (inComeData["id"] == "all") {
+      publicMqtt(String(getRoot()), String(getValue("mqttUser")) + "/" + NAME_DEVICE + "/tx",false);
 
-	mqttClient.setUsernamePassword(getValue("mqttUser"), getValue("mqttPass"));
-	mqttClient.connect(getValue("mqttAddr"), String(getValue("mqttPort")).toInt());
-  
- mqttClient.setConnectionTimeout(3000);
+    } else if (inComeData["id"] == "ui") {
+      publicMqtt(String(getPage()), String(getValue("mqttUser")) + "/" + NAME_DEVICE + "/dashboard",true);
 
-
-    mqttClient.onMessage([](int messageSize){
-    	String tmp;
-  while (mqttClient.available()) {
-  	tmp+=mqttClient.readString();
-
-
-  }
-  	json2MapInComeData(tmp);
-
-   	setValue(inComeData["id"],inComeData["value"]);
-   	if(inComeData["id"]== "all"){
-   		publicMqtt(String(getRoot()),String(getValue("mqttUser")) +"/"+NAME_DEVICE+ "/tx");
-   	}else if (inComeData["id"] == "ui"){
-      publicMqtt(getPage(),String(getValue("mqttUser")) +"/"+NAME_DEVICE+ "/dashboard");
 
     }
-
 
   });
+  String clientId = NAME_DEVICE;
+  clientId += String(random(0xffff), HEX);
+  mqttClient.connect(clientId.c_str(), getValue("mqttUser"), getValue("mqttPass"));
+  mqttClient.subscribe((String(getValue("mqttUser")) + "/" + NAME_DEVICE + "/rx/#").c_str(), 1);
 
 
-  mqttClient.subscribe(String(getValue("mqttUser")) +"/"+NAME_DEVICE+ "/rx/#", 1);
-  
-  publicMqtt(getPage(),String(getValue("mqttUser")) +"/"+NAME_DEVICE+ "/dashboard");
+  isPubDasboard = false;
+
+
 }
-void mqttHandle(){
-  if(!mqttClient.connected()){
-    initMqttConnection();
-    }
 
-    mqttClient.poll();
+void mqttHandle() {
+  if (!mqttClient.connected()) {
+    initMqttConnection();
+    return;
+  }
+  if (!isPubDasboard) {
+    publicMqtt(String(getPage()), String(getValue("mqttUser")) + "/" + NAME_DEVICE + "/dashboard",true);
+    isPubDasboard = true;
+  }
+
+  mqttClient.loop();
 }
 void json2MapInComeData(String json) {
   inComeData.clear();

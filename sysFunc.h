@@ -4,9 +4,11 @@
 #include "FS.h"
 #include "sysDefine.h"
 #include <map>
+uint32_t epochTime=0;
+uint32_t epochTimeTmp=0;
 
+uint32_t countSetValue = 0;
 volatile bool isLoadConfigFile = false;
-volatile bool setValueFlag = false;
 
 typedef void(*onValueChange)(String val);
 std::map < String, onValueChange > listFunc;
@@ -85,9 +87,9 @@ void loadConfigFile(bool clearNotImportant ) {
   String tmp = cfg_file.readString();
     json2Map(tmp);
 
-   LOG(String("Content config file: "));
-   LOG(tmp);
-   LOG(String("Content root file: "));
+//   LOG(String("Content config file: "));
+//   LOG(tmp);
+//   LOG(String("Content root file: "));
    LOG(getRoot());
   isLoadConfigFile = true;
   cfg_file.close();
@@ -98,8 +100,8 @@ void loadConfigFile(bool clearNotImportant ) {
 
 void saveConfigFile() {
   config2Json();
-   LOG(F("saveConfigFile: "));
-   LOG(bufContent);
+//   LOG(F("saveConfigFile: "));
+//   LOG(bufContent);
   if (!isLoadConfigFile){
     LOG(F("load config file first !!!"));
     return;
@@ -115,7 +117,8 @@ void saveConfigFile() {
 }
 
 void setValue(String key, String value, bool init) {
-   setValueFlag = true;
+  countSetValue++;
+
    if(changeFlag[key] == true)
     return;
   if(!(value == "")){

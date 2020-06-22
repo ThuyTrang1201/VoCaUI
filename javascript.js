@@ -1,5 +1,5 @@
 var rfg = []; // yêu cầu dữ liệu
-
+var tokn = 0;
 function sdt(i, v) {
     var f = new FormData();
     f.append(i, v);
@@ -59,9 +59,11 @@ function ajax() {
             var res = conn.responseText;
             console.log(res);
             var o = JSON.parse(res);
+            tokn= conn.getResponseHeader('tokn');
             for (x in o) {
                 e = document.getElementById(x);
                 rfg.splice(rfg.indexOf(x), 1);
+
                 senb(x, true);
                 if (e == null)
                     continue;
@@ -105,8 +107,11 @@ function ajax() {
             ajax();
         }
     };
-    conn.open("GET", "/trans", !0);
-    conn.send();
+
+    conn.open("POST", "/trans", !0);
+    var f = new FormData();
+    f.append('tokn', tokn);
+    conn.send(f);
 }
 
 function onloadDone() {
