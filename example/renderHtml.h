@@ -220,7 +220,6 @@ void render_init(String title) {
   end_menu();
   begin_menu("mail", "Quản Lý Mail");
 
-  render_inputText("desMail", "Mail", true);
     render_textView("mailCnt", "Mail đang chờ gửi", true);
   render_inputText("tknMail", "Token Mail", true);
 
